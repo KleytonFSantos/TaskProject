@@ -2,24 +2,24 @@ import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
-  SafeAreaView,
   TouchableOpacity,
   FlatList,
 } from "react-native";
 
 import { FontAwesome } from "@expo/vector-icons";
-import { database } from "../../config/firebaseconfig";
+import { app } from "../../config/firebaseconfig";
 import { styles } from "./style";
 
-export const Task = ({ navigation }) => {
-  const [tasks, setTasks] = useState([]);
 
+export const Task = ({ navigation, route }) => {
+  const [tasks, setTasks] = useState([]);
+  const db = app.firestore()
   const deleteTask = (id) => {
-    database.collection("Tasks").doc(id).delete();
+    db.collection(route.params.idUser).doc(id).delete();
   };
 
   useEffect(() => {
-    database.collection("Tasks").onSnapshot((query) => {
+    db.collection(route.params.idUser).onSnapshot((query) => {
       const list = [];
       query.forEach((doc) => {
         list.push({ ...doc.data(), id: doc.id });
@@ -64,7 +64,7 @@ export const Task = ({ navigation }) => {
       />
       <TouchableOpacity
         style={styles.buttonNewTasks}
-        onPress={() => navigation.navigate("New Task")}
+        onPress={() => navigation.navigate("New Task", { idUser: route.params.idUser })}
       >
         <Text style={styles.iconButton}>+</Text>
       </TouchableOpacity>
